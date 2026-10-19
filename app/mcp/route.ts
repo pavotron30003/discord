@@ -21,10 +21,10 @@ export const maxDuration = 60;
 const { requiredScope } = getAuthConfig();
 const oauthScheme = [{ type: "oauth2", scopes: [requiredScope] }];
 
-function descriptor(config: {
+function descriptor<TInput extends z.ZodType>(config: {
   title: string;
   description: string;
-  inputSchema: any;
+  inputSchema: TInput;
   readOnly?: boolean;
   destructive?: boolean;
   idempotent?: boolean;
@@ -41,7 +41,7 @@ function descriptor(config: {
       idempotentHint: !!config.idempotent,
       openWorldHint: false,
     },
-  } as any;
+  };
 }
 
 function auditHeaders(reason?: string): Record<string, string> {
