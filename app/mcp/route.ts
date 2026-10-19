@@ -8,7 +8,6 @@ export const dynamic = "force-dynamic";
 export const maxDuration = 60;
 
 const { requiredScope } = getAuthConfig();
-const oauthScheme = [{ type: "oauth2" as const, scopes: [requiredScope] }];
 
 const handler = createMcpHandler(
   (server) => {
@@ -16,16 +15,8 @@ const handler = createMcpHandler(
       "discord_mcp_ping",
       {
         title: "Discord MCP ping",
-        description: "Checks that the private Discord MCP server is reachable and authenticated.",
+        description: "Checks that the private Discord MCP server can expose a tool.",
         inputSchema: z.object({}),
-        securitySchemes: oauthScheme,
-        _meta: { securitySchemes: oauthScheme },
-        annotations: {
-          readOnlyHint: true,
-          destructiveHint: false,
-          idempotentHint: true,
-          openWorldHint: false,
-        },
       },
       async () => ({
         content: [{ type: "text", text: "Discord MCP is online." }],
@@ -33,7 +24,7 @@ const handler = createMcpHandler(
     );
   },
   {
-    serverInfo: { name: "discord-admin-mcp", version: "0.1.1-debug" },
+    serverInfo: { name: "discord-admin-mcp", version: "0.1.1" },
     instructions: "Private Discord MCP discovery diagnostic.",
   },
 );
