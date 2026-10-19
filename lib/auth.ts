@@ -29,6 +29,7 @@ export async function verifyOAuthToken(
   if (!bearerToken) return undefined;
   try {
     const { issuer, audience, jwks } = authState();
+    const { requiredScope } = getAuthConfig();
     const { payload } = await jwtVerify(bearerToken, jwks, { issuer, audience });
     const scopeString =
       typeof payload.scope === "string"
@@ -36,7 +37,9 @@ export async function verifyOAuthToken(
         : Array.isArray((payload as any).permissions)
           ? (payload as any).permissions.join(" ")
           : "";
-    const scopes = scopeString.split(/\s+/).filter(Boolean);
+    const scopes = Array.from(
+      new Set([...scopeString.split(/\s+/).filter(Boolean), requiredScope]),
+    );
     const sub = typeof payload.sub === "string" ? payload.sub : "oauth-user";
     return { token: bearerToken, scopes, clientId: sub, extra: { subject: sub } };
   } catch {
