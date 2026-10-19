@@ -1,4 +1,5 @@
 import { createMcpHandler, withMcpAuth } from "mcp-handler";
+import { z } from "zod";
 import { getAuthConfig } from "../../lib/env";
 import { verifyOAuthToken } from "../../lib/auth";
 
@@ -8,6 +9,10 @@ export const maxDuration = 60;
 
 const { requiredScope } = getAuthConfig();
 
+const oauthSchemes = [
+  { type: "oauth2", scopes: [requiredScope] },
+];
+
 const handler = createMcpHandler(
   (server) => {
     server.registerTool(
@@ -15,25 +20,24 @@ const handler = createMcpHandler(
       {
         title: "Discord MCP ping",
         description: "Checks that the private Discord MCP server can expose an authenticated tool.",
-        inputSchema: {},
-        outputSchema: {},
-        securitySchemes: [
-          { type: "oauth2", scopes: [requiredScope] },
-        ],
+        inputSchema: z.object({}),
+        securitySchemes: oauthSchemes,
+        _meta: {
+          securitySchemes: oauthSchemes,
+        },
         annotations: {
           readOnlyHint: true,
           destructiveHint: false,
           openWorldHint: false,
         },
-      },
+      } as any,
       async () => ({
         content: [{ type: "text", text: "Discord MCP is online." }],
-        structuredContent: {},
       }),
     );
   },
   {
-    serverInfo: { name: "discord-admin-mcp", version: "0.1.2" },
+    serverInfo: { name: "discord-admin-mcp", version: "0.1.3" },
     instructions: "Private Discord MCP discovery diagnostic.",
   },
 );
